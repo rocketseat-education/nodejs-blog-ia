@@ -1,18 +1,19 @@
 import http from 'node:http'
 
+const { API_PORT, API_HOST, API_PROTOCOL } = process.env
+
+const posts = []
+
 // Req = Request (Requisição)
 // Res = Response (Resposta)
 const server = http.createServer((req, res) => {
-  const { url, method, headers } = req
-  const path = url.split('?')[0]
-  const params = url.split('?')[1].split('&').map(param => param.split('='))
-  console.log("method", method)
-  console.log("path", path)
-  console.log("params", params)
+  const { url, method } = req
+  const paths = url.split('?').filter(Boolean)
+  const path = paths.at(0) || '/'
 
-  if (path === '/products' && method === 'GET') {
+  if (path === '/posts' && method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' })
-    return res.end(JSON.stringify({ data: [{ id: 1, name: "Product 1" }] }))
+    return res.end(JSON.stringify({ data: posts }))
   }
 
   if (path === '/products' && method === 'POST') {
@@ -33,9 +34,10 @@ const server = http.createServer((req, res) => {
   }
 
   res.writeHead(404, { 'Content-Type': 'application/json' })
-  return res.end(JSON.stringify({ message: "Not Found" })) 
+  return res.end(JSON.stringify({ message: "Not Found" }))
 })
 
-server.listen(9090, () => {
-  console.log('Server running on http://localhost:9090')
+server.listen(API_PORT, API_HOST, () => {
+  console.log(`Server running on ${API_PROTOCOL}://${API_HOST}:${API_PORT}`)
+  console.log("Press CTRL+C to stop")
 })

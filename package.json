@@ -2,7 +2,9 @@
   "name": "rocketseat-blog-ia-nodejs",
   "version": "1.0.0",
   "scripts": {
-    "dev": "node --watch src/index.js"
+    "dev": "node --env-file=.env.local --watch src/index.js",
+    "env:setup": "cp .env.example .env.local",
+    "local:setup": "npm run env:setup"
   },
   "license": "ISC",
   "type": "module"
