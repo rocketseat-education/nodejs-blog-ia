@@ -12,9 +12,9 @@ function mapRowToPost(row) {
   }
 }
 
-export async function findAllPosts() {
+export async function findAllPublishedAndApprovedPosts() {
   const { rows } = await pool.query(
-    'SELECT id, title, content, published_at, created_at, approved_at, rejected_at FROM posts ORDER BY published_at DESC',
+    'SELECT id, title, content, published_at, created_at, approved_at, rejected_at FROM posts WHERE published_at <= NOW() AND approved_at IS NOT NULL AND rejected_at IS NULL ORDER BY published_at DESC',
   )
 
   return rows.map(mapRowToPost)
@@ -44,6 +44,22 @@ export async function insertPost(post) {
       post.rejected_at,
     ],
   )
+
+  return mapRowToPost(rows[0])
+}
+
+export async function approvePostById(id) {
+  const { rows } = await pool.query(
+    `UPDATE posts
+     SET approved_at = NOW(), published_at = NOW()
+     WHERE id = $1
+     RETURNING id, title, content, published_at, created_at, approved_at, rejected_at`,
+    [id],
+  )
+
+  if (!rows[0]) {
+    return null
+  }
 
   return mapRowToPost(rows[0])
 }

@@ -38,6 +38,10 @@ export function createRouter() {
       register('POST', path, handler)
     },
 
+    patch(path, handler) {
+      register('PATCH', path, handler)
+    },
+
     async dispatch(req, res) {
       const pathname = req.url.split('?')[0] || '/'
 
