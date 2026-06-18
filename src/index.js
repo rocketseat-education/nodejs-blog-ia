@@ -1,4 +1,5 @@
 import http from 'node:http'
+import { createPostDraft } from './services/create-post-draft.js'
 
 const { API_PORT, API_HOST, API_PROTOCOL } = process.env
 
@@ -16,18 +17,26 @@ const server = http.createServer((req, res) => {
     return res.end(JSON.stringify({ data: posts }))
   }
 
-  if (path === '/products' && method === 'POST') {
+  if (path === '/posts/draft' && method === 'POST') {
     const bodyBuffer = []
     let body = null
     
     // Armazena o corpo da requisição em um array
     req.on('data', chunk => bodyBuffer.push(chunk))
-    req.on('end', () => {
-      const bodyString = Buffer.concat(bodyBuffer).toString()
-      body = JSON.parse(bodyString)
+    req.on('end', async () => {
+      try {
+        const bodyString = Buffer.concat(bodyBuffer).toString()
+        body = JSON.parse(bodyString)
 
-      res.writeHead(201, { 'Content-Type': 'application/json' })
-      return res.end(JSON.stringify({ message: "Product created", body }))
+        const post = await createPostDraft(body.idea)
+        posts.push(post)
+
+        res.writeHead(201, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ data: post }))
+      } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ message: error.message }))
+      }
     })
 
     return;
