@@ -2,6 +2,8 @@
   "name": "rocketseat-blog-ia-nodejs",
   "version": "1.0.0",
   "scripts": {
+    "build": "docker build -t rocketseat-blog-ia-nodejs:latest .",
+    "start": "node src/index.js",
     "dev": "node --env-file=.env.local --watch src/index.js",
     "env:setup": "cp .env.example .env.local",
     "local:setup": "npm run env:setup && npm run infra:up && npm run migrate:up",
