@@ -42,6 +42,10 @@ export function createRouter() {
       register('PATCH', path, handler)
     },
 
+    delete(path, handler) {
+      register('DELETE', path, handler)
+    },
+
     async dispatch(req, res) {
       const pathname = req.url.split('?')[0] || '/'
 

@@ -51,7 +51,23 @@ export async function insertPost(post) {
 export async function approvePostById(id) {
   const { rows } = await pool.query(
     `UPDATE posts
-     SET approved_at = NOW(), published_at = NOW()
+     SET approved_at = NOW(), published_at = NOW(), rejected_at = NULL
+     WHERE id = $1
+     RETURNING id, title, content, published_at, created_at, approved_at, rejected_at`,
+    [id],
+  )
+
+  if (!rows[0]) {
+    return null
+  }
+
+  return mapRowToPost(rows[0])
+}
+
+export async function rejectPostById(id) {
+  const { rows } = await pool.query(
+    `UPDATE posts
+     SET rejected_at = NOW(), published_at = NULL, approved_at = NULL
      WHERE id = $1
      RETURNING id, title, content, published_at, created_at, approved_at, rejected_at`,
     [id],
